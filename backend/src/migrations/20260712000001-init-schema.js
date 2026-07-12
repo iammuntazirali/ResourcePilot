@@ -323,7 +323,7 @@ module.exports = {
       reason: { type: Sequelize.TEXT, allowNull: true },
       metadata: { type: Sequelize.JSON, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
-      updated_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     });
 
     await queryInterface.createTable('assignment_requests', {
@@ -456,7 +456,7 @@ module.exports = {
       ip_address: { type: Sequelize.STRING(45), allowNull: true },
       user_agent: { type: Sequelize.STRING(500), allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
-      updated_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     });
     await queryInterface.addIndex('audit_logs', ['entity_type', 'entity_id']);
     await queryInterface.addIndex('audit_logs', ['user_id', 'created_at']);
@@ -478,7 +478,7 @@ module.exports = {
       is_read: { type: Sequelize.BOOLEAN, defaultValue: false },
       read_at: { type: Sequelize.DATE, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
-      updated_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     });
     await queryInterface.addIndex('notifications', ['user_id', 'is_read', 'created_at']);
   },

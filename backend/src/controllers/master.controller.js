@@ -1,6 +1,6 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess, sendCreated } = require('../utils/response');
-const { Department, Location, AssetCategory, Vendor, Notification } = require('../models');
+const { Department, Location, AssetCategory, Vendor, Notification, User, Role } = require('../models');
 
 exports.listDepartments = asyncHandler(async (req, res) => {
   const departments = await Department.findAll({ order: [['name', 'ASC']] });
@@ -87,4 +87,59 @@ exports.markNotificationRead = asyncHandler(async (req, res) => {
     { where: { id: req.params.id, userId: req.user.id } }
   );
   sendSuccess(res, null, null, 'Marked as read');
+});
+
+exports.listUsers = asyncHandler(async (req, res) => {
+  const users = await User.findAll({
+    include: [
+      { model: Role, as: 'roles', attributes: ['id', 'name', 'displayName'] },
+      { model: Department, as: 'department', attributes: ['id', 'name'] },
+    ],
+    order: [['firstName', 'ASC']],
+  });
+  sendSuccess(res, users);
+});
+
+exports.updateUserRole = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { roleName, departmentId } = req.body;
+  const ApiError = require('../utils/ApiError');
+
+  const user = await User.findByPk(id);
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  if (departmentId !== undefined) {
+    await user.update({ departmentId: departmentId || null });
+  }
+
+  if (roleName) {
+    const role = await Role.findOne({ where: { name: roleName } });
+    if (!role) {
+      throw ApiError.notFound('Role not found');
+    }
+
+    await require('../models').UserRole.destroy({ where: { userId: id } });
+    await require('../models').UserRole.create({
+      userId: id,
+      roleId: role.id,
+      assignedAt: new Date(),
+    });
+  }
+
+  const updatedUser = await User.findByPk(id, {
+    include: [
+      { model: Role, as: 'roles', attributes: ['id', 'name', 'displayName'] },
+      { model: Department, as: 'department', attributes: ['id', 'name'] },
+    ],
+  });
+
+  sendSuccess(res, updatedUser, 'User profile updated successfully');
+});
+
+exports.listAuditLogs = asyncHandler(async (req, res) => {
+  const auditService = require('../services/audit.service');
+  const logs = await auditService.listAuditLogs();
+  sendSuccess(res, logs);
 });

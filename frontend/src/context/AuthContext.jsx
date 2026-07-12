@@ -20,6 +20,17 @@ export const AuthProvider = ({ children }) => {
     return payload;
   };
 
+  const signup = async (signupData) => {
+    const { data } = await authApi.signup(signupData);
+    const payload = data.data;
+    localStorage.setItem('accessToken', payload.accessToken);
+    localStorage.setItem('refreshToken', payload.refreshToken);
+    setUser(payload.user);
+    setRoles(payload.roles);
+    setPermissions(payload.permissions);
+    return payload;
+  };
+
   const logout = async () => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
@@ -53,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const value = useMemo(
-    () => ({ user, roles, permissions, loading, login, logout, hasPermission }),
+    () => ({ user, roles, permissions, loading, login, signup, logout, hasPermission }),
     [user, roles, permissions, loading]
   );
 

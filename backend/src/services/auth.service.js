@@ -132,10 +132,62 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   await RefreshToken.update({ revokedAt: new Date() }, { where: { userId, revokedAt: null } });
 };
 
+const signup = async (data, req) => {
+  const email = data.email.toLowerCase().trim();
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    throw ApiError.badRequest('Email is already registered');
+  }
+
+  const existingCode = await User.findOne({ where: { employeeCode: data.employeeCode } });
+  if (existingCode) {
+    throw ApiError.badRequest('Employee code is already registered');
+  }
+
+  const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
+
+  const role = await Role.findOne({ where: { name: 'employee' } });
+  if (!role) {
+    throw ApiError.internal('Employee role not configured in the system');
+  }
+
+  const user = await User.create({
+    email,
+    passwordHash,
+    employeeCode: data.employeeCode,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    phone: data.phone || null,
+    departmentId: data.departmentId || null,
+    isActive: true,
+  });
+
+  await require('../models').UserRole.create({
+    userId: user.id,
+    roleId: role.id,
+    assignedAt: new Date(),
+  });
+
+  const { user: authUser, roles, permissions } = await getUserAuthPayload(user.id);
+  const accessToken = signAccessToken(user.id, roles, permissions);
+  const refreshToken = await createRefreshToken(user.id);
+
+  await createAuditLog({
+    userId: user.id,
+    action: 'SIGNUP',
+    entityType: 'user',
+    entityId: user.id,
+    req,
+  });
+
+  return { user: authUser, accessToken, refreshToken, roles, permissions };
+};
+
 const hashPassword = (password) => bcrypt.hash(password, SALT_ROUNDS);
 
 module.exports = {
   login,
+  signup,
   refresh,
   logout,
   changePassword,

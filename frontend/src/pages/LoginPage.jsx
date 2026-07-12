@@ -3,10 +3,15 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
-  const { login, user } = useAuth();
+  const { login, signup, user } = useAuth();
   const navigate = useNavigate();
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('admin@assetflow.com');
   const [password, setPassword] = useState('Admin@123');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [employeeCode, setEmployeeCode] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,10 +22,14 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      if (isSignUp) {
+        await signup({ email, password, firstName, lastName, employeeCode, phone });
+      } else {
+        await login(email, password);
+      }
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Login failed');
+      setError(err.response?.data?.error?.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -42,16 +51,70 @@ export default function LoginPage() {
         </ul>
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-6">
-        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
+      <div className="flex flex-1 items-center justify-center px-6 py-12">
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Sign in</h2>
-            <p className="mt-1 text-sm text-slate-500">Access your AssetFlow workspace</p>
+            <h2 className="text-2xl font-bold text-slate-900">
+              {isSignUp ? 'Create an Employee Account' : 'Sign in'}
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {isSignUp ? 'Register for your AssetFlow workspace' : 'Access your AssetFlow workspace'}
+            </p>
           </div>
 
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
+            </div>
+          )}
+
+          {isSignUp && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {isSignUp && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Employee Code</label>
+                <input
+                  type="text"
+                  value={employeeCode}
+                  onChange={(e) => setEmployeeCode(e.target.value)}
+                  placeholder="e.g. EMP-101"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Phone</label>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                />
+              </div>
             </div>
           )}
 
@@ -82,15 +145,30 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Processing...' : isSignUp ? 'Sign up' : 'Sign in'}
           </button>
 
-          <div className="rounded-lg bg-slate-50 p-4 text-xs text-slate-600">
-            <p className="font-medium">Demo accounts (password: Admin@123)</p>
-            <p>admin@assetflow.com — Super Admin</p>
-            <p>manager@assetflow.com — Asset Manager</p>
-            <p>employee@assetflow.com — Employee</p>
+          <div className="text-center text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+              }}
+              className="text-brand-600 hover:underline"
+            >
+              {isSignUp ? 'Already have an account? Sign in' : 'Register a new Employee account'}
+            </button>
           </div>
+
+          {!isSignUp && (
+            <div className="rounded-lg bg-slate-50 p-4 text-xs text-slate-600">
+              <p className="font-medium">Demo accounts (password: Admin@123)</p>
+              <p>admin@assetflow.com — Super Admin</p>
+              <p>manager@assetflow.com — Asset Manager</p>
+              <p>employee@assetflow.com — Employee</p>
+            </div>
+          )}
         </form>
       </div>
     </div>

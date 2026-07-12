@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       imageUrl: { type: DataTypes.STRING(500), field: 'image_url' },
       isConsumable: { type: DataTypes.BOOLEAN, defaultValue: false, field: 'is_consumable' },
       quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
+      isBookable: { type: DataTypes.BOOLEAN, defaultValue: false, field: 'is_bookable' },
       createdBy: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false, field: 'created_by' },
     },
     { tableName: 'assets', paranoid: true }
@@ -48,6 +49,9 @@ module.exports = (sequelize, DataTypes) => {
     Asset.hasMany(models.AssetDocument, { foreignKey: 'assetId', as: 'documents' });
     Asset.hasMany(models.AssetStatusHistory, { foreignKey: 'assetId', as: 'statusHistory' });
     Asset.hasMany(models.Assignment, { foreignKey: 'assetId', as: 'assignments' });
+    Asset.hasMany(models.Booking, { foreignKey: 'assetId', as: 'bookings' });
+    Asset.hasMany(models.Maintenance, { foreignKey: 'assetId', as: 'maintenances' });
+    Asset.hasMany(models.AuditItem, { foreignKey: 'assetId', as: 'auditItems' });
   };
 
   return Asset;

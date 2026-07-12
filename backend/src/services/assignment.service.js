@@ -88,7 +88,7 @@ const approveRequest = async (requestId, approver, { assetId, expectedReturnDate
 
     const asset = await Asset.findByPk(targetAssetId, { transaction: t, lock: t.LOCK.UPDATE });
     if (!asset) throw ApiError.notFound('Asset not found');
-    if (asset.status !== ASSET_STATUS.IN_STOCK) {
+    if (asset.status !== ASSET_STATUS.IN_STOCK && asset.status !== ASSET_STATUS.ASSIGNED) {
       throw ApiError.badRequest('Asset is not available', 'ASSET_NOT_AVAILABLE');
     }
 
@@ -96,8 +96,19 @@ const approveRequest = async (requestId, approver, { assetId, expectedReturnDate
       where: { assetId: targetAssetId, status: ASSIGNMENT_STATUS.ACTIVE },
       transaction: t,
     });
+
     if (activeAssignment) {
-      throw ApiError.badRequest('Asset already has active assignment', 'ASSET_NOT_AVAILABLE');
+      // Handle transfer workflow: complete the active assignment
+      await activeAssignment.update(
+        {
+          status: ASSIGNMENT_STATUS.RETURNED,
+          returnedAt: new Date(),
+          returnedTo: approver.id,
+          returnCondition: asset.condition,
+          returnNotes: `Transferred to request ${request.requestNumber}`,
+        },
+        { transaction: t }
+      );
     }
 
     await request.update(

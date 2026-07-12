@@ -7,6 +7,11 @@ exports.login = asyncHandler(async (req, res) => {
   sendSuccess(res, result, null, 'Login successful');
 });
 
+exports.signup = asyncHandler(async (req, res) => {
+  const result = await authService.signup(req.body, req);
+  sendCreated(res, result, 'User registered successfully');
+});
+
 exports.refresh = asyncHandler(async (req, res) => {
   const result = await authService.refresh(req.body.refreshToken);
   sendSuccess(res, result);

@@ -21,4 +21,12 @@ const createAuditLog = async ({
   });
 };
 
-module.exports = { createAuditLog };
+const listAuditLogs = async () => {
+  return AuditLog.findAll({
+    include: [{ model: require('../models').User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'email'] }],
+    order: [['createdAt', 'DESC']],
+    limit: 100,
+  });
+};
+
+module.exports = { createAuditLog, listAuditLogs };

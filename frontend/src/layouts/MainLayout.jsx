@@ -1,21 +1,41 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const navItems = [
-  { to: '/', label: 'Dashboard', icon: '📊' },
-  { to: '/assets', label: 'Assets', icon: '💻' },
-  { to: '/requests', label: 'Requests', icon: '📋' },
-  { to: '/assignments', label: 'Assignments', icon: '🔄' },
-];
-
 export default function MainLayout() {
-  const { user, logout } = useAuth();
+  const { user, roles, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
+
+  const isAdmin = roles.includes('super_admin');
+  const isAuditor = roles.includes('auditor');
+  const isManager = roles.includes('asset_manager');
+
+  const navItems = [
+    { to: '/', label: 'Dashboard', icon: '📊' },
+    { to: '/assets', label: 'Assets', icon: '💻' },
+    { to: '/requests', label: 'Requests', icon: '📋' },
+    { to: '/assignments', label: 'Assignments', icon: '🔄' },
+    { to: '/bookings', label: 'Bookings', icon: '📅' },
+    { to: '/maintenance', label: 'Maintenance', icon: '🔧' },
+  ];
+
+  if (isAdmin || isAuditor) {
+    navItems.push({ to: '/audits', label: 'Auditing', icon: '🔍' });
+  }
+
+  if (isAdmin || isManager || isAuditor) {
+    navItems.push({ to: '/reports', label: 'Analytics', icon: '📈' });
+  }
+
+  if (isAdmin) {
+    navItems.push({ to: '/org-setup', label: 'Org Setup', icon: '⚙️' });
+  }
+
+  navItems.push({ to: '/activity', label: 'Activity & Logs', icon: '🔔' });
 
   return (
     <div className="flex min-h-screen">

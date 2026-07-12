@@ -29,4 +29,8 @@ router.post('/vendors', authenticate, requirePermission(PERMISSIONS.VENDOR_CREAT
 router.get('/notifications', authenticate, masterController.listNotifications);
 router.patch('/notifications/:id/read', authenticate, masterController.markNotificationRead);
 
+router.get('/users', authenticate, masterController.listUsers);
+router.patch('/users/:id/role', authenticate, masterController.updateUserRole);
+router.get('/audit-logs', authenticate, masterController.listAuditLogs);
+
 module.exports = router;

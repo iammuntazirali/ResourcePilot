@@ -7,6 +7,12 @@ import AssetsPage from './pages/AssetsPage';
 import AssetDetailPage from './pages/AssetDetailPage';
 import RequestsPage from './pages/RequestsPage';
 import AssignmentsPage from './pages/AssignmentsPage';
+import OrgSetupPage from './pages/OrgSetupPage';
+import BookingsPage from './pages/BookingsPage';
+import MaintenancePage from './pages/MaintenancePage';
+import AuditPage from './pages/AuditPage';
+import ReportsPage from './pages/ReportsPage';
+import LogsNotificationsPage from './pages/LogsNotificationsPage';
 
 export default function App() {
   return (
@@ -19,6 +25,12 @@ export default function App() {
           <Route path="assets/:id" element={<AssetDetailPage />} />
           <Route path="requests" element={<RequestsPage />} />
           <Route path="assignments" element={<AssignmentsPage />} />
+          <Route path="org-setup" element={<OrgSetupPage />} />
+          <Route path="bookings" element={<BookingsPage />} />
+          <Route path="maintenance" element={<MaintenancePage />} />
+          <Route path="audits" element={<AuditPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="activity" element={<LogsNotificationsPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
