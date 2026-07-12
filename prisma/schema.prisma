@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  name         String
+  role         String   @default("EMPLOYEE") // ADMIN, MANAGER, HEAD, EMPLOYEE
+  departmentId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  allocations  Allocation[]
+  bookings     Booking[]
+  maintenances Maintenance[] @relation("RequestedBy")
+  approvedMaint Maintenance[] @relation("ApprovedBy")
+  auditCycles  AuditCycle[]
+  notifications Notification[]
+  activityLogs ActivityLog[]
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  headId    String?  // user ID of the department head
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+}
+
+model Asset {
+  id          String   @id @default(cuid())
+  tag         String   @unique
+  name        String
+  category    String
+  serial      String?
+  cost        Float?
+  condition   String   @default("GOOD") // NEW, GOOD, FAIR, POOR
+  location    String?
+  status      String   @default("AVAILABLE") // AVAILABLE, ALLOCATED, UNDER_MAINTENANCE, LOST, RETIRED, DISPOSED
+  isShared    Boolean  @default(false)
+  photo       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  currentAllocation Allocation?
+  bookings          Booking[]
+  maintenances      Maintenance[]
+  auditItems        AuditItem[]
+}
+
+model Allocation {
+  id          String   @id @default(cuid())
+  assetId     String   @unique // one active allocation per asset
+  asset       Asset    @relation(fields: [assetId], references: [id])
+  employeeId  String
+  employee    User     @relation(fields: [employeeId], references: [id])
+  expectedReturnDate DateTime?
+  returned    Boolean  @default(false)
+  conditionNotes String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  status    String   @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED, CANCELLED
+  createdAt DateTime @default(now())
+}
+
+model Maintenance {
+  id          String   @id @default(cuid())
+  assetId     String
+  asset       Asset    @relation(fields: [assetId], references: [id])
+  issue       String
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, IN_PROGRESS, RESOLVED
+  createdById String
+  createdBy   User     @relation("RequestedBy", fields: [createdById], references: [id])
+  approvedById String?
+  approvedBy   User?   @relation("ApprovedBy", fields: [approvedById], references: [id])
+  resolutionNotes String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditCycle {
+  id          String   @id @default(cuid())
+  name        String
+  scope       String   // e.g., "IT Department" or JSON string
+  status      String   @default("ACTIVE") // ACTIVE, CLOSED
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  closedAt    DateTime?
+  items       AuditItem[]
+}
+
+model AuditItem {
+  id        String   @id @default(cuid())
+  cycleId   String
+  cycle     AuditCycle @relation(fields: [cycleId], references: [id])
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  status    String   // VERIFIED, MISSING, DAMAGED
+  notes     String?
+  checkedAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  type      String   // e.g., OVERDUE, ALLOCATED, APPROVED
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   String   // JSON stringified details
+  createdAt DateTime @default(now())
+}
