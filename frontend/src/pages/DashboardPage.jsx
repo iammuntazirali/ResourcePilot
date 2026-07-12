@@ -25,72 +25,77 @@ export default function DashboardPage() {
   }));
 
   const kpis = [
-    { label: 'Total Assets', value: data?.totalAssets || 0, color: 'text-slate-900 bg-slate-50' },
-    { label: 'Available Assets', value: data?.assetsAvailable || 0, color: 'text-indigo-600 bg-indigo-50/50' },
-    { label: 'Allocated Assets', value: data?.assetsAllocated || 0, color: 'text-sky-600 bg-sky-50/50' },
-    { label: 'Active Bookings', value: data?.activeBookings || 0, color: 'text-emerald-600 bg-emerald-50/50' },
-    { label: 'Repairs (Today)', value: data?.maintenanceToday || 0, color: 'text-amber-600 bg-amber-50/50' },
-    { label: 'Pending Transfers', value: data?.pendingTransfers || 0, color: 'text-purple-600 bg-purple-50/50' },
-    { label: 'Upcoming Returns', value: data?.upcomingReturns || 0, color: 'text-blue-600 bg-blue-50/50' },
-    { label: 'Overdue Returns ⚠️', value: data?.overdueReturns || 0, color: 'text-red-700 bg-red-50 border border-red-200' },
+    { label: 'Total Assets', value: data?.totalAssets || 0, color: 'text-slate-900', border: 'border-slate-100 bg-white/70' },
+    { label: 'Available Assets', value: data?.assetsAvailable || 0, color: 'text-violet-600', border: 'border-violet-100 bg-violet-50/20' },
+    { label: 'Allocated Assets', value: data?.assetsAllocated || 0, color: 'text-blue-600', border: 'border-blue-100 bg-blue-50/20' },
+    { label: 'Active Bookings', value: data?.activeBookings || 0, color: 'text-emerald-600', border: 'border-emerald-100 bg-emerald-50/20' },
+    { label: 'Repairs (Today)', value: data?.maintenanceToday || 0, color: 'text-amber-600', border: 'border-amber-100 bg-amber-50/20' },
+    { label: 'Pending Transfers', value: data?.pendingTransfers || 0, color: 'text-fuchsia-600', border: 'border-fuchsia-100 bg-fuchsia-50/20' },
+    { label: 'Upcoming Returns', value: data?.upcomingReturns || 0, color: 'text-sky-600', border: 'border-sky-100 bg-sky-50/20' },
+    { label: 'Overdue Returns ⚠️', value: data?.overdueReturns || 0, color: 'text-rose-600', border: 'border-rose-200 bg-rose-50/30' },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-1">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-slate-500">Overview of your asset portfolio</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Portfolio Dashboard</h1>
+        <p className="text-slate-500 mt-1 text-sm">Real-time operational snapshot of enterprise resources</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className={`rounded-xl border border-slate-200 p-5 shadow-sm ${kpi.color}`}>
-            <p className="text-sm font-medium opacity-80">{kpi.label}</p>
-            <p className="mt-2 text-3xl font-bold">{kpi.value}</p>
+          <div key={kpi.label} className={`rounded-2xl border p-6 hover-lift transition ${kpi.border}`}>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
+            <p className={`mt-3 text-3xl font-extrabold ${kpi.color}`}>{kpi.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="mb-4 font-semibold text-slate-900">Assets by Status</h3>
-          {chartData.length ? (
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
-                  {chartData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-sm text-slate-500">No asset data yet</p>
-          )}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2 hover-lift transition">
+          <h3 className="mb-4 text-base font-bold text-slate-900">Asset Distribution by Status</h3>
+          <div className="h-72">
+            {chartData.length ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={95} innerRadius={55} label>
+                    {chartData.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-sm text-slate-500 text-center py-20">No asset data yet</p>
+            )}
+          </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="mb-4 font-semibold text-slate-900">Quick Actions</h3>
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-1 hover-lift transition">
+          <h3 className="mb-4 text-base font-bold text-slate-900">Quick Actions</h3>
           <div className="space-y-3">
             <a
               href="/assets"
-              className="block rounded-lg border border-slate-200 px-4 py-3 text-sm hover:bg-slate-50"
+              className="flex items-center justify-between rounded-xl border border-slate-100 p-4 text-sm font-semibold text-slate-700 bg-slate-50/50 hover:bg-brand-50/20 hover:border-brand-200 transition group"
             >
-              View all assets →
+              <span>💻 View all assets</span>
+              <span className="text-slate-400 group-hover:text-brand-600 transition">→</span>
             </a>
             <a
               href="/requests"
-              className="block rounded-lg border border-slate-200 px-4 py-3 text-sm hover:bg-slate-50"
+              className="flex items-center justify-between rounded-xl border border-slate-100 p-4 text-sm font-semibold text-slate-700 bg-slate-50/50 hover:bg-brand-50/20 hover:border-brand-200 transition group"
             >
-              Manage assignment requests →
+              <span>📋 Manage assignment requests</span>
+              <span className="text-slate-400 group-hover:text-brand-600 transition">→</span>
             </a>
             <a
               href="/assignments"
-              className="block rounded-lg border border-slate-200 px-4 py-3 text-sm hover:bg-slate-50"
+              className="flex items-center justify-between rounded-xl border border-slate-100 p-4 text-sm font-semibold text-slate-700 bg-slate-50/50 hover:bg-brand-50/20 hover:border-brand-200 transition group"
             >
-              View active assignments →
+              <span>🔄 View active assignments</span>
+              <span className="text-slate-400 group-hover:text-brand-600 transition">→</span>
             </a>
           </div>
         </div>
