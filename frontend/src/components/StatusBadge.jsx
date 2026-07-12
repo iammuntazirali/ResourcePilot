@@ -1,26 +1,51 @@
 const STATUS_COLORS = {
-  draft: 'bg-slate-100 text-slate-700',
-  in_stock: 'bg-emerald-100 text-emerald-800',
-  assigned: 'bg-blue-100 text-blue-800',
-  under_maintenance: 'bg-amber-100 text-amber-800',
-  lost: 'bg-red-100 text-red-800',
-  retired: 'bg-gray-100 text-gray-700',
-  disposed: 'bg-stone-200 text-stone-800',
-  submitted: 'bg-indigo-100 text-indigo-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  active: 'bg-blue-100 text-blue-800',
-  returned: 'bg-emerald-100 text-emerald-800',
-  overdue: 'bg-orange-100 text-orange-800',
-  cancelled: 'bg-gray-100 text-gray-600',
+  // Asset states
+  in_stock: 'chip-available',
+  assigned: 'chip-allocated',
+  under_maintenance: 'chip-maintenance',
+  lost: 'chip-lost-damaged',
+  damaged: 'chip-lost-damaged',
+  retired: 'chip-disposed',
+  disposed: 'chip-disposed',
+
+  // Request / Assignment states
+  draft: 'bg-slate-100 text-slate-700 border border-slate-200',
+  submitted: 'bg-[#3d6fe0]/10 text-[#3d6fe0] border border-[#3d6fe0]/20',
+  approved: 'bg-[#2e8b57]/10 text-[#2e8b57] border border-[#2e8b57]/20',
+  rejected: 'bg-[#c0392b]/10 text-[#c0392b] border border-[#c0392b]/20',
+  active: 'bg-[#3d6fe0]/10 text-[#3d6fe0] border border-[#3d6fe0]/20',
+  returned: 'bg-[#2e8b57]/10 text-[#2e8b57] border border-[#2e8b57]/20',
+  overdue: 'bg-[#d9622b]/10 text-[#d9622b] border border-[#d9622b]/20',
+  
+  // Bookings
+  upcoming: 'chip-reserved',
+  ongoing: 'chip-allocated',
+  completed: 'chip-available',
+  cancelled: 'chip-disposed',
+};
+
+const DOT_COLORS = {
+  in_stock: 'dot-available',
+  assigned: 'dot-allocated',
+  under_maintenance: 'dot-maintenance',
+  lost: 'dot-lost-damaged',
+  damaged: 'dot-lost-damaged',
+  retired: 'dot-disposed',
+  disposed: 'dot-disposed',
+  upcoming: 'dot-reserved',
+  ongoing: 'dot-allocated',
+  completed: 'dot-available',
+  cancelled: 'dot-disposed',
 };
 
 export default function StatusBadge({ status }) {
   const label = status?.replace(/_/g, ' ') || 'unknown';
-  const colors = STATUS_COLORS[status] || 'bg-slate-100 text-slate-700';
+  const colors = STATUS_COLORS[status] || 'bg-slate-100 text-slate-700 border border-slate-200';
+  const dotColor = DOT_COLORS[status];
 
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${colors}`}>
+    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold capitalize ${colors}`}>
+      {dotColor && <span className={`status-dot ${dotColor}`} />}
       {label}
     </span>
   );

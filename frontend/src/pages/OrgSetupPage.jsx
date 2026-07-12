@@ -13,6 +13,8 @@ export default function OrgSetupPage() {
 
   const [showCatForm, setShowCatForm] = useState(false);
   const [catForm, setCatForm] = useState({ name: '', code: '', parentId: '', depreciationYears: 3, requiresSerial: true });
+  const [customFields, setCustomFields] = useState(['Warranty Period']);
+  const [newFieldName, setNewFieldName] = useState('');
 
   const [editingUserId, setEditingUserId] = useState(null);
   const [userForm, setUserForm] = useState({ roleName: '', departmentId: '' });
@@ -59,6 +61,12 @@ export default function OrgSetupPage() {
     }
   };
 
+  const handleAddField = () => {
+    if (!newFieldName.trim()) return;
+    setCustomFields([...customFields, newFieldName.trim()]);
+    setNewFieldName('');
+  };
+
   const handleUpdateUser = async (e, userId) => {
     e.preventDefault();
     try {
@@ -75,94 +83,94 @@ export default function OrgSetupPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Organization Setup</h1>
-        <p className="text-slate-500">Configure master data and manage employee roles</p>
+      <div className="border-b border-[#E1E1DC] pb-5">
+        <h1 className="text-3xl font-extrabold text-[#14171C]">Organization Master</h1>
+        <p className="text-sm text-[#5B6470] mt-1">Configure company hierarchy settings, category tags, and roles mapping</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-[#E1E1DC] bg-[#F5F6F4] p-1 rounded-md max-w-md">
         <button
           onClick={() => setActiveTab('departments')}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition ${
-            activeTab === 'departments' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`flex-1 text-center py-2 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer ${
+            activeTab === 'departments' ? 'bg-[#12151B] text-white shadow-sm' : 'text-[#5B6470] hover:text-[#14171C]'
           }`}
         >
           Departments
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition ${
-            activeTab === 'categories' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`flex-1 text-center py-2 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer ${
+            activeTab === 'categories' ? 'bg-[#12151B] text-white shadow-sm' : 'text-[#5B6470] hover:text-[#14171C]'
           }`}
         >
           Asset Categories
         </button>
         <button
           onClick={() => setActiveTab('employees')}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition ${
-            activeTab === 'employees' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`flex-1 text-center py-2 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer ${
+            activeTab === 'employees' ? 'bg-[#12151B] text-white shadow-sm' : 'text-[#5B6470] hover:text-[#14171C]'
           }`}
         >
-          Employee Directory
+          Employees
         </button>
       </div>
 
-      {/* Departments Tab */}
+      {/* Tab Content A: Departments */}
       {activeTab === 'departments' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-950">Departments List</h3>
+            <h3 className="font-bold text-[#14171C]">Active Department Listing</h3>
             <button
               onClick={() => setShowDeptForm(!showDeptForm)}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700"
+              className="glow-btn text-xs py-2 uppercase tracking-wider"
             >
-              {showDeptForm ? 'Cancel' : '+ New Department'}
+              {showDeptForm ? 'Collapse Form' : '+ Register Department'}
             </button>
           </div>
 
           {showDeptForm && (
-            <form onSubmit={handleCreateDept} className="rounded-xl border bg-white p-6 shadow-sm space-y-4 max-w-xl">
+            <form onSubmit={handleCreateDept} className="border border-[#E1E1DC] rounded-md bg-white p-6 shadow-sm space-y-4 max-w-xl">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Department Name</label>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Department Name</label>
                   <input
                     type="text"
                     value={deptForm.name}
                     onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Department Code</label>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Department Code</label>
                   <input
                     type="text"
                     value={deptForm.code}
                     onChange={(e) => setDeptForm({ ...deptForm, code: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
                     required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Cost Center Code</label>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Cost Center Code</label>
                   <input
                     type="text"
                     value={deptForm.costCenterCode}
                     onChange={(e) => setDeptForm({ ...deptForm, costCenterCode: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Parent Department</label>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Parent Department</label>
                   <select
                     value={deptForm.parentId}
                     onChange={(e) => setDeptForm({ ...deptForm, parentId: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2.5 text-sm focus:border-[#3D6FE0] focus:outline-none"
                   >
-                    <option value="">None (Top Level)</option>
+                    <option value="">Top-Level Department</option>
                     {departments.map((d) => (
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
@@ -170,45 +178,43 @@ export default function OrgSetupPage() {
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Department Head</label>
+                <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Department Head</label>
                 <select
                   value={deptForm.headUserId}
                   onChange={(e) => setDeptForm({ ...deptForm, headUserId: e.target.value })}
-                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  className="w-full rounded border border-[#E1E1DC] px-3 py-2.5 text-sm focus:border-[#3D6FE0] focus:outline-none"
                 >
-                  <option value="">Select Head User (Optional)</option>
+                  <option value="">Select Employee Head...</option>
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
                   ))}
                 </select>
               </div>
-              <button type="submit" className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700">
-                Save Department
+              <button type="submit" className="glow-btn text-xs py-2 uppercase tracking-wider">
+                Confirm Registry
               </button>
             </form>
           )}
 
-          <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-            <table className="min-w-full divide-y text-sm">
-              <thead className="bg-slate-50">
+          <div className="overflow-hidden border border-[#E1E1DC] rounded-md bg-white">
+            <table className="table-industrial">
+              <thead>
                 <tr>
                   <th className="px-4 py-3 text-left">Code</th>
                   <th className="px-4 py-3 text-left">Department Name</th>
                   <th className="px-4 py-3 text-left">Cost Center</th>
-                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">Head Assignee</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody>
                 {departments.map((d) => (
-                  <tr key={d.id}>
-                    <td className="px-4 py-3 font-semibold text-slate-900">{d.code}</td>
-                    <td className="px-4 py-3 text-slate-700">{d.name}</td>
-                    <td className="px-4 py-3 text-slate-500">{d.costCenterCode || 'N/A'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${d.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-700'}`}>
-                        {d.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                  <tr key={d.id} className="hover:bg-[#F5F6F4]/50">
+                    <td className="px-4 py-3 font-bold mono-text text-[#14171C]">
+                      <span className="asset-tag-chip">{d.code}</span>
                     </td>
+                    <td className="px-4 py-3 font-semibold text-[#14171C]">{d.name}</td>
+                    <td className="px-4 py-3 text-[#5B6470] mono-text">{d.costCenterCode || 'N/A'}</td>
+                    <td className="px-4 py-3 text-xs text-[#5B6470]">Head Assignee</td>
                   </tr>
                 ))}
               </tbody>
@@ -217,136 +223,161 @@ export default function OrgSetupPage() {
         </div>
       )}
 
-      {/* Categories Tab */}
+      {/* Tab Content B: Categories */}
       {activeTab === 'categories' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-950">Asset Categories List</h3>
+            <h3 className="font-bold text-[#14171C]">Hardware Category Settings</h3>
             <button
               onClick={() => setShowCatForm(!showCatForm)}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700"
+              className="glow-btn text-xs py-2 uppercase tracking-wider"
             >
-              {showCatForm ? 'Cancel' : '+ New Category'}
+              {showCatForm ? 'Collapse Form' : '+ Create Category'}
             </button>
           </div>
 
           {showCatForm && (
-            <form onSubmit={handleCreateCat} className="rounded-xl border bg-white p-6 shadow-sm space-y-4 max-w-xl">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Category Name</label>
+            <div className="grid gap-6 md:grid-cols-2">
+              <form onSubmit={handleCreateCat} className="border border-[#E1E1DC] rounded-md bg-white p-6 shadow-sm space-y-4">
+                <h4 className="font-bold text-sm text-[#14171C] uppercase tracking-wider border-b pb-2 mb-2">Category Attributes</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Category Name</label>
+                    <input
+                      type="text"
+                      value={catForm.name}
+                      onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
+                      className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Category Code</label>
+                    <input
+                      type="text"
+                      value={catForm.code}
+                      onChange={(e) => setCatForm({ ...catForm, code: e.target.value })}
+                      className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Depreciation (Years)</label>
+                    <input
+                      type="number"
+                      value={catForm.depreciationYears}
+                      onChange={(e) => setCatForm({ ...catForm, depreciationYears: e.target.value })}
+                      className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
+                      min={1}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Parent Category</label>
+                    <select
+                      value={catForm.parentId}
+                      onChange={(e) => setCatForm({ ...catForm, parentId: e.target.value })}
+                      className="w-full rounded border border-[#E1E1DC] px-3 py-2.5 text-sm focus:border-[#3D6FE0] focus:outline-none"
+                    >
+                      <option value="">None (Top Level)</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="requiresSerial"
+                    checked={catForm.requiresSerial}
+                    onChange={(e) => setCatForm({ ...catForm, requiresSerial: e.target.checked })}
+                    className="rounded border-[#E1E1DC] text-[#3D6FE0] focus:ring-[#3D6FE0]"
+                  />
+                  <label htmlFor="requiresSerial" className="text-xs font-semibold text-[#14171C]">
+                    Mandate unique serial number entry on allocation
+                  </label>
+                </div>
+                <button type="submit" className="glow-btn text-xs py-2 uppercase tracking-wider">
+                  Save Category Tag
+                </button>
+              </form>
+
+              {/* Custom-field builder */}
+              <div className="border border-[#E1E1DC] rounded-md bg-white p-6 shadow-sm space-y-4">
+                <h4 className="font-bold text-sm text-[#14171C] uppercase tracking-wider border-b pb-2 mb-2">Category Custom Fields Builder</h4>
+                <p className="text-xs text-[#5B6470]">Define optional specifications (e.g., Warranty, RAM configuration) to collect for this asset category.</p>
+                <div className="flex gap-2">
                   <input
                     type="text"
-                    value={catForm.name}
-                    onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
-                    required
+                    placeholder="Field name (e.g. Screen Size)"
+                    value={newFieldName}
+                    onChange={(e) => setNewFieldName(e.target.value)}
+                    className="flex-1 rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none"
                   />
+                  <button type="button" onClick={handleAddField} className="glow-btn-secondary text-xs font-bold uppercase tracking-wider">
+                    Add Field
+                  </button>
                 </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Category Code</label>
-                  <input
-                    type="text"
-                    value={catForm.code}
-                    onChange={(e) => setCatForm({ ...catForm, code: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
-                    required
-                  />
+                <div className="space-y-1.5 pt-2">
+                  <p className="text-[10px] font-bold text-[#5B6470] uppercase">Configured Fields List</p>
+                  {customFields.map((f, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs border border-[#E1E1DC] rounded p-2 bg-[#F5F6F4]/50">
+                      <span className="font-semibold text-[#14171C]">{f}</span>
+                      <span className="text-[9px] font-bold text-[#3D6FE0] uppercase bg-[#3D6FE0]/10 px-1 rounded">Text Box</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Depreciation (Years)</label>
-                  <input
-                    type="number"
-                    value={catForm.depreciationYears}
-                    onChange={(e) => setCatForm({ ...catForm, depreciationYears: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
-                    min={1}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Parent Category</label>
-                  <select
-                    value={catForm.parentId}
-                    onChange={(e) => setCatForm({ ...catForm, parentId: e.target.value })}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
-                  >
-                    <option value="">None (Top Level)</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="requiresSerial"
-                  checked={catForm.requiresSerial}
-                  onChange={(e) => setCatForm({ ...catForm, requiresSerial: e.target.checked })}
-                  className="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                />
-                <label htmlFor="requiresSerial" className="text-sm font-medium text-slate-700">
-                  Requires serial number registration
-                </label>
-              </div>
-              <button type="submit" className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700">
-                Save Category
-              </button>
-            </form>
+            </div>
           )}
 
-          <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-            <table className="min-w-full divide-y text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-4 py-3 text-left">Code</th>
-                  <th className="px-4 py-3 text-left">Category Name</th>
-                  <th className="px-4 py-3 text-left">Depreciation Period</th>
-                  <th className="px-4 py-3 text-left">Requires Serial</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {categories.map((c) => (
-                  <tr key={c.id}>
-                    <td className="px-4 py-3 font-semibold text-slate-900">{c.code}</td>
-                    <td className="px-4 py-3 text-slate-700">{c.name}</td>
-                    <td className="px-4 py-3 text-slate-500">{c.depreciationYears ? `${c.depreciationYears} Years` : 'N/A'}</td>
-                    <td className="px-4 py-3 text-slate-500">{c.requiresSerial ? 'Yes' : 'No'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {categories.map((c) => (
+              <div key={c.id} className="industrial-card p-5 relative overflow-hidden border-[#E1E1DC] bg-white">
+                <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 w-8 h-8 rounded-full bg-[#E3A72E]/10"></div>
+                <span className="asset-tag-chip mb-2">{c.code}</span>
+                <h4 className="font-bold text-[#14171C] text-sm mt-1">{c.name}</h4>
+                <div className="text-[10px] text-[#5B6470] font-bold uppercase tracking-wider mt-3 space-y-1 border-t pt-3 border-dashed">
+                  <p>🗓️ Depreciation: {c.depreciationYears || 3} Years</p>
+                  <p>⚙️ Serial Required: {c.requiresSerial ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Employees Directory Tab */}
+      {/* Tab Content C: Employees */}
       {activeTab === 'employees' && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-950">Employee Roster</h3>
-          <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-            <table className="min-w-full divide-y text-sm">
-              <thead className="bg-slate-50">
+          <div>
+            <h3 className="font-bold text-[#14171C]">System Employee Directory</h3>
+            <p className="text-xs text-[#5B6470]">Assign organizational departments and promote system access roles</p>
+          </div>
+
+          <div className="overflow-hidden border border-[#E1E1DC] rounded-md bg-white">
+            <table className="table-industrial">
+              <thead>
                 <tr>
                   <th className="px-4 py-3 text-left">Code</th>
                   <th className="px-4 py-3 text-left">Name</th>
-                  <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Email Address</th>
                   <th className="px-4 py-3 text-left">Department</th>
-                  <th className="px-4 py-3 text-left">System Role</th>
+                  <th className="px-4 py-3 text-left">Access Role</th>
                   <th className="px-4 py-3 text-left">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody>
                 {users.map((u) => (
-                  <tr key={u.id}>
-                    <td className="px-4 py-3 font-medium text-slate-900">{u.employeeCode}</td>
-                    <td className="px-4 py-3 text-slate-700">{u.firstName} {u.lastName}</td>
-                    <td className="px-4 py-3 text-slate-600">{u.email}</td>
-                    <td className="px-4 py-3 text-slate-600">{u.department?.name || 'Unassigned'}</td>
-                    <td className="px-4 py-3 text-slate-700">
-                      <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 uppercase">
+                  <tr key={u.id} className="hover:bg-[#F5F6F4]/50">
+                    <td className="px-4 py-3 font-semibold text-[#14171C] mono-text">{u.employeeCode}</td>
+                    <td className="px-4 py-3 font-semibold text-[#14171C]">{u.firstName} {u.lastName}</td>
+                    <td className="px-4 py-3 text-[#5B6470] mono-text">{u.email}</td>
+                    <td className="px-4 py-3 text-[#5B6470]">{u.department?.name || 'Unassigned'}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded bg-[#12151B] px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider mono-text">
                         {u.roles?.map((r) => r.displayName).join(', ') || 'Employee'}
                       </span>
                     </td>
@@ -356,10 +387,10 @@ export default function OrgSetupPage() {
                           <select
                             value={userForm.roleName}
                             onChange={(e) => setUserForm({ ...userForm, roleName: e.target.value })}
-                            className="rounded border p-1 text-xs"
+                            className="rounded border p-1 text-xs text-[#14171C] font-semibold bg-[#F5F6F4]"
                             required
                           >
-                            <option value="">Change Role</option>
+                            <option value="">Select Role</option>
                             <option value="super_admin">Super Admin</option>
                             <option value="asset_manager">Asset Manager</option>
                             <option value="department_head">Department Head</option>
@@ -370,15 +401,15 @@ export default function OrgSetupPage() {
                           <select
                             value={userForm.departmentId}
                             onChange={(e) => setUserForm({ ...userForm, departmentId: e.target.value })}
-                            className="rounded border p-1 text-xs"
+                            className="rounded border p-1 text-xs text-[#14171C] font-semibold bg-[#F5F6F4]"
                           >
                             <option value="">Select Dept</option>
                             {departments.map((d) => (
                               <option key={d.id} value={d.id}>{d.name}</option>
                             ))}
                           </select>
-                          <button type="submit" className="rounded bg-brand-600 px-2 py-1 text-xs text-white">Save</button>
-                          <button type="button" onClick={() => setEditingUserId(null)} className="rounded bg-slate-200 px-2 py-1 text-xs text-slate-800">Cancel</button>
+                          <button type="submit" className="rounded bg-[#3D6FE0] px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider cursor-pointer">Save</button>
+                          <button type="button" onClick={() => setEditingUserId(null)} className="rounded bg-slate-200 px-2.5 py-1 text-[10px] font-bold text-slate-800 uppercase tracking-wider cursor-pointer">Close</button>
                         </form>
                       ) : (
                         <button
@@ -390,7 +421,7 @@ export default function OrgSetupPage() {
                               departmentId: u.departmentId || '',
                             });
                           }}
-                          className="text-brand-600 text-xs font-medium hover:underline"
+                          className="text-[#3D6FE0] text-xs font-bold hover:underline"
                         >
                           Promote / Edit
                         </button>

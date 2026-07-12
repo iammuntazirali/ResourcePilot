@@ -85,6 +85,30 @@ exports.dashboard = asyncHandler(async (req, res) => {
     },
   });
 
+  const overdueList = await Assignment.findAll({
+    where: {
+      status: 'active',
+      expectedReturnDate: { [Op.lt]: new Date() },
+    },
+    include: [
+      { model: Asset, as: 'asset', attributes: ['id', 'assetTag', 'name'] },
+      { model: User, as: 'custodian', attributes: ['id', 'firstName', 'lastName'] },
+    ],
+    limit: 5,
+  });
+
+  const upcomingList = await Assignment.findAll({
+    where: {
+      status: 'active',
+      expectedReturnDate: { [Op.gt]: new Date() },
+    },
+    include: [
+      { model: Asset, as: 'asset', attributes: ['id', 'assetTag', 'name'] },
+      { model: User, as: 'custodian', attributes: ['id', 'firstName', 'lastName'] },
+    ],
+    limit: 5,
+  });
+
   const pendingRequests = await AssignmentRequest.count({
     where: { status: 'submitted' },
   });
@@ -106,6 +130,8 @@ exports.dashboard = asyncHandler(async (req, res) => {
     pendingTransfers,
     upcomingReturns,
     overdueReturns,
+    overdueList,
+    upcomingList,
     pendingRequests,
     activeAssignments,
     unreadNotifications,

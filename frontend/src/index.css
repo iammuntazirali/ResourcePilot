@@ -1,16 +1,110 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-900: #312e81;
-  --color-surface: #f8fafc;
-  --color-sidebar: #0f172a;
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #e0ebff;
+  --color-brand-500: #3d6fe0;
+  --color-brand-600: #305cb8;
+  --color-brand-700: #254a99;
+  --color-brand-900: #1b3570;
+  --color-surface: #f5f6f4;
+  --color-sidebar: #12151b;
+  --color-accent: #e3a72e;
+  --color-border-custom: #e1e1dc;
 }
 
 body {
-  @apply bg-surface text-slate-800 antialiased;
+  font-family: 'Inter', sans-serif;
+  @apply bg-surface text-[#14171c] antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.mono-text {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Asset Tag Chip with left-edge notch/perforation */
+.asset-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem 0.2rem 0.75rem;
+  border: 1px solid #e1e1dc;
+  background-color: #ffffff;
+  color: #14171c;
+  border-radius: 4px;
+  position: relative;
+  letter-spacing: -0.02em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.asset-tag-chip::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background-color: #f5f6f4; /* Matches target surface background */
+  border-radius: 50%;
+  border: 1px solid #e1e1dc;
+  box-sizing: border-box;
+}
+
+/* Status Chip Dots */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Status Color Classes */
+.dot-available { background-color: #2e8b57; }
+.dot-allocated { background-color: #3d6fe0; }
+.dot-reserved { background-color: #e3a72e; }
+.dot-maintenance { background-color: #d9622b; }
+.dot-lost-damaged { background-color: #c0392b; }
+.dot-disposed { background-color: #6b7280; }
+
+.chip-available { @apply bg-[#2e8b57]/10 text-[#2e8b57] border border-[#2e8b57]/20; }
+.chip-allocated { @apply bg-[#3d6fe0]/10 text-[#3d6fe0] border border-[#3d6fe0]/20; }
+.chip-reserved { @apply bg-[#e3a72e]/10 text-[#e3a72e] border border-[#e3a72e]/20; }
+.chip-maintenance { @apply bg-[#d9622b]/10 text-[#d9622b] border border-[#d9622b]/20; }
+.chip-lost-damaged { @apply bg-[#c0392b]/10 text-[#c0392b] border border-[#c0392b]/20; }
+.chip-disposed { @apply bg-[#6b7280]/10 text-[#6b7280] border border-[#6b7280]/20; }
+
+.industrial-card {
+  @apply bg-white border border-[#e1e1dc] rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition duration-150;
+}
+.industrial-card:hover {
+  @apply border-[#c1c1bc];
+}
+
+.table-industrial {
+  @apply min-w-full divide-y divide-[#e1e1dc] text-sm;
+}
+.table-industrial thead {
+  @apply bg-[#12151b]/5 text-[#5b6470] font-semibold text-xs uppercase tracking-wider;
+}
+.table-industrial tbody {
+  @apply bg-white divide-y divide-[#e1e1dc]/60;
+}
+
+.glow-btn {
+  @apply font-semibold bg-[#3d6fe0] text-white rounded-md px-4 py-2 hover:bg-[#305cb8] active:bg-[#254a99] transition duration-150 shadow-sm cursor-pointer;
+}
+.glow-btn-secondary {
+  @apply font-semibold bg-white border border-[#e1e1dc] text-[#14171c] rounded-md px-4 py-2 hover:bg-[#f5f6f4] active:bg-[#e1e1dc] transition duration-150 shadow-sm cursor-pointer;
+}
+.glow-btn-accent {
+  @apply font-semibold bg-[#e3a72e] text-white rounded-md px-4 py-2 hover:bg-[#c58d20] active:bg-[#a87417] transition duration-150 shadow-sm cursor-pointer;
 }

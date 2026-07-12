@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { bookingApi, assetApi } from '../services';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
+import { CalendarRange, Clock, AlertTriangle } from 'lucide-react';
 
 export default function BookingsPage() {
   const { user } = useAuth();
@@ -12,11 +13,9 @@ export default function BookingsPage() {
   const [error, setError] = useState('');
 
   const load = () => {
-    // List bookable assets
     assetApi.list({ limit: 100 }).then(({ data }) => {
       setBookableAssets(data.data.filter((a) => a.isBookable));
     });
-    // List all bookings
     bookingApi.list().then(({ data }) => setBookings(data.data));
   };
 
@@ -53,10 +52,10 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-[#E1E1DC] pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Resource Bookings</h1>
-          <p className="text-slate-500">Book shared resources (meeting rooms, projectors, vehicles, etc.)</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#14171C]">Resource Reservations</h1>
+          <p className="text-sm text-[#5B6470] mt-1">Book shared conference rooms, workspaces, and testing hardware blocks</p>
         </div>
         <button
           type="button"
@@ -64,116 +63,137 @@ export default function BookingsPage() {
             setShowForm(!showForm);
             setError('');
           }}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700"
+          className="glow-btn text-xs uppercase tracking-wider"
         >
-          {showForm ? 'Cancel' : '+ Book Resource'}
+          {showForm ? 'Collapse Form' : '+ Request Reservation'}
         </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-xl border bg-white p-6 shadow-sm space-y-4 max-w-lg">
-          <h3 className="font-semibold text-slate-950">Book a Resource Time Slot</h3>
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-xs text-red-700">
-              {error}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left Side: Booking Form or resource timeline blocks */}
+        <div className="lg:col-span-1 space-y-6">
+          {showForm ? (
+            <form onSubmit={handleSubmit} className="border border-[#E1E1DC] rounded-md bg-white p-6 shadow-sm space-y-4">
+              <h3 className="font-bold text-sm text-[#14171C] uppercase tracking-wider border-b pb-2 mb-2">Reserve Resource Slot</h3>
+              {error && (
+                <div className="rounded border border-red-200 bg-red-50 p-4 text-xs text-red-700 font-semibold flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold uppercase tracking-wide">Slot Conflict Rejected</p>
+                    <p className="mt-1 font-medium">{error}</p>
+                  </div>
+                </div>
+              )}
+              <div>
+                <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Select Resource</label>
+                <select
+                  value={form.assetId}
+                  onChange={(e) => setForm({ ...form, assetId: e.target.value })}
+                  className="w-full rounded border border-[#E1E1DC] px-3 py-2.5 text-sm focus:border-[#3D6FE0] focus:outline-none"
+                  required
+                >
+                  <option value="">Select shared resource...</option>
+                  {bookableAssets.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({a.assetTag})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">Start Date/Time</label>
+                  <input
+                    type="datetime-local"
+                    value={form.startTime}
+                    onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-[#5B6470] uppercase">End Date/Time</label>
+                  <input
+                    type="datetime-local"
+                    value={form.endTime}
+                    onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                    className="w-full rounded border border-[#E1E1DC] px-3 py-2 text-sm focus:border-[#3D6FE0] focus:outline-none mono-text"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="glow-btn w-full text-xs py-2.5 uppercase tracking-wider">
+                Confirm Booking
+              </button>
+            </form>
+          ) : (
+            <div className="border border-[#E1E1DC] rounded-md bg-white p-6 shadow-sm space-y-4">
+              <h3 className="font-bold text-sm text-[#14171C] uppercase tracking-wider border-b pb-2">Active Resources</h3>
+              <p className="text-xs text-[#5B6470]">List of shared bookable spaces & hardware tag blocks.</p>
+              <div className="space-y-2">
+                {bookableAssets.map((a) => (
+                  <div key={a.id} className="flex justify-between items-center text-xs border border-[#E1E1DC] rounded p-3 bg-[#F5F6F4]/40">
+                    <div>
+                      <p className="font-bold text-[#14171C]">{a.name}</p>
+                      <p className="text-[10px] text-[#5B6470] mt-0.5">{a.location?.name || 'Main Office'}</p>
+                    </div>
+                    <span className="asset-tag-chip">{a.assetTag}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Resource / Asset</label>
-            <select
-              value={form.assetId}
-              onChange={(e) => setForm({ ...form, assetId: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm"
-              required
-            >
-              <option value="">Select shared resource...</option>
-              {bookableAssets.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.assetTag} — {a.name} ({a.location?.name || 'No location'})
-                </option>
-              ))}
-            </select>
-          </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Start Date/Time</label>
-              <input
-                type="datetime-local"
-                value={form.startTime}
-                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">End Date/Time</label>
-              <input
-                type="datetime-local"
-                value={form.endTime}
-                onChange={(e) => setForm({ ...form, endTime: e.target.value })}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
-                required
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700">
-            Confirm Booking
-          </button>
-        </form>
-      )}
-
-      {/* Bookings List */}
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <table className="min-w-full divide-y text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-4 py-3 text-left">Resource</th>
-              <th className="px-4 py-3 text-left">Booked By</th>
-              <th className="px-4 py-3 text-left">Time Slot</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+        {/* Right Side: Timeline colored blocks list of Bookings */}
+        <div className="lg:col-span-2 space-y-4">
+          <h3 className="font-bold text-sm text-[#14171C] uppercase tracking-wider">Reservation Calendar Feed</h3>
+          
+          <div className="space-y-3">
             {bookings.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                  No active or upcoming bookings
-                </td>
-              </tr>
+              <div className="border border-[#E1E1DC] rounded-md bg-white p-8 text-center text-xs text-[#5B6470]">
+                No active or upcoming reservations recorded.
+              </div>
             ) : (
               bookings.map((b) => (
-                <tr key={b.id}>
-                  <td className="px-4 py-3 font-semibold text-slate-900">
-                    {b.asset?.assetTag} — {b.asset?.name}
-                  </td>
-                  <td className="px-4 py-3 text-slate-700">
-                    {b.user?.firstName} {b.user?.lastName}
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">
-                    {new Date(b.startTime).toLocaleString()} - {new Date(b.endTime).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3">
+                <div key={b.id} className="border border-[#E1E1DC] rounded-md bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 border border-[#E1E1DC] rounded bg-[#F5F6F4]">
+                      <CalendarRange className="h-5 w-5 text-[#3D6FE0]" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="asset-tag-chip">{b.asset?.assetTag}</span>
+                        <p className="font-bold text-[#14171C] text-sm">{b.asset?.name}</p>
+                      </div>
+                      <p className="text-xs text-[#5B6470] font-semibold">Reservee: {b.user?.firstName} {b.user?.lastName}</p>
+                      <p className="text-[10px] text-[#5B6470] flex items-center gap-1 mt-1 font-medium">
+                        <Clock className="h-3 w-3 text-slate-400" />
+                        <span className="mono-text">{new Date(b.startTime).toLocaleString()}</span>
+                        <span>➔</span>
+                        <span className="mono-text">{new Date(b.endTime).toLocaleString()}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex sm:flex-col sm:items-end justify-between items-center gap-2">
                     <StatusBadge status={b.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    {b.status === 'upcoming' && (b.userId === user?.id || user?.roles?.includes('super_admin')) && (
+                    {b.status === 'upcoming' && (b.userId === user?.id || user?.roles?.some(r => r.name === 'super_admin')) && (
                       <button
                         type="button"
                         onClick={() => handleCancel(b.id)}
-                        className="text-red-600 hover:underline font-medium text-xs"
+                        className="text-rose-600 hover:underline font-bold text-xs cursor-pointer"
                       >
-                        Cancel
+                        Cancel Booking
                       </button>
                     )}
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))
             )}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );
